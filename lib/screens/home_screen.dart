@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/email_config_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/star_icon.dart';
 
@@ -42,12 +43,13 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          Consumer<AuthService>(
-            builder: (context, authService, child) {
+          Consumer2<AuthService, EmailConfigService>(
+            builder: (context, authService, emailConfigService, child) {
               return PopupMenuButton<String>(
                 onSelected: (value) {
                   if (value == 'logout') {
                     authService.logout();
+                    emailConfigService.clearConfig();
                   }
                 },
                 itemBuilder: (context) => [

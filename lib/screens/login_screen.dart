@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/star_icon.dart';
+import 'email_config_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -54,11 +55,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordError = 'Please enter your password';
       });
       hasErrors = true;
-    } else if (_passwordController.text.length < 6) {
-      setState(() {
-        _passwordError = 'Password must be at least 6 characters';
-      });
-      hasErrors = true;
     }
 
     if (hasErrors) return;
@@ -67,7 +63,13 @@ class _LoginScreenState extends State<LoginScreen> {
     final authService = Provider.of<AuthService>(context, listen: false);
     final success = await authService.login(_emailController.text, _passwordController.text);
 
-    if (!success && mounted) {
+    if (success && mounted) {
+      // Navigate to email configuration screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const EmailConfigScreen()),
+      );
+    } else if (!success && mounted) {
       setState(() {
         _emailError = 'Invalid credentials';
       });
@@ -80,13 +82,12 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 380),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+          child: Container(
+            width: 420,
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                   // logo & title
                   Container(
                     width: 56,
@@ -136,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black.withValues(alpha: 0.04),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -178,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black.withValues(alpha: 0.04),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -217,6 +218,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           vertical: 14,
                         ),
                       ),
+                      onFieldSubmitted: (_) {
+                        _handleLogin();
+                      },
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -237,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: !authService.isLoading ? [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
+                              color: Colors.black.withValues(alpha: 0.08),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -336,7 +340,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   
                   const SizedBox(height: 24),
                 ],
-              ),
             ),
           ),
         ),

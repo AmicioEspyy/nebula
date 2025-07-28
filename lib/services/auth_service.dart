@@ -4,10 +4,12 @@ class AuthService extends ChangeNotifier {
   bool _isLoggedIn = false;
   bool _isLoading = false;
   String? _userEmail;
+  String? _userPassword;
 
   bool get isLoggedIn => _isLoggedIn;
   bool get isLoading => _isLoading;
   String? get userEmail => _userEmail;
+  String? get userPassword => _userPassword;
 
   // check login status on startup
   Future<void> checkLoginStatus() async {
@@ -37,6 +39,7 @@ class AuthService extends ChangeNotifier {
       if (email.isNotEmpty && password.length >= 6) {
         _isLoggedIn = true;
         _userEmail = email;
+        _userPassword = password;
         _isLoading = false;
         notifyListeners();
         return true;
@@ -56,6 +59,7 @@ class AuthService extends ChangeNotifier {
   Future<void> logout() async {
     _isLoggedIn = false;
     _userEmail = null;
+    _userPassword = null;
     notifyListeners();
   }
 }

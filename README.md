@@ -1,4 +1,4 @@
-# ✨ Nebula Email Client
+# ✨ nebula
 
 A modern, clean email client built with Flutter (originally wanted to build it in C# but Avalonia makes me blaspheme too much) because all other email clients are terrible and I couldn't find a decent one.
 
