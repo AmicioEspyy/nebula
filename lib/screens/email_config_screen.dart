@@ -28,6 +28,12 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
   String? _errorMessage;
   bool _hasTestedConnection = false;
   bool _connectionSuccessful = false;
+  
+  // individual connection status
+  bool _hasTestedSmtp = false;
+  bool _hasTestedImap = false;
+  bool _smtpSuccessful = false;
+  bool _imapSuccessful = false;
 
   final List<String> _securityOptions = ['SSL/TLS', 'STARTTLS', 'None'];
 
@@ -107,6 +113,10 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
         _isTesting = false;
         _hasTestedConnection = true;
         _connectionSuccessful = false;
+        _hasTestedSmtp = true;
+        _hasTestedImap = true;
+        _smtpSuccessful = false;
+        _imapSuccessful = false;
       });
       return;
     }
@@ -127,19 +137,33 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
         password: authService.userPassword!,
       );
       
-      // test connection with temporary config
-      final result = await emailConfigService.testConnectionWithConfig(tempConfig);
+      // test smtp connection individually
+      final smtpResult = await emailConfigService.testSmtpOnly(tempConfig);
+      
+      // test imap connection individually
+      final imapResult = await emailConfigService.testImapOnly(tempConfig);
+      
+      // overall result
+      final overallResult = smtpResult && imapResult;
       
       setState(() {
         _isTesting = false;
         _hasTestedConnection = true;
-        _connectionSuccessful = result;
+        _connectionSuccessful = overallResult;
+        _hasTestedSmtp = true;
+        _hasTestedImap = true;
+        _smtpSuccessful = smtpResult;
+        _imapSuccessful = imapResult;
       });
     } catch (e) {
       setState(() {
         _isTesting = false;
         _hasTestedConnection = true;
         _connectionSuccessful = false;
+        _hasTestedSmtp = true;
+        _hasTestedImap = true;
+        _smtpSuccessful = false;
+        _imapSuccessful = false;
       });
     }
   }
@@ -212,7 +236,7 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
     } else {
       statusColor = const Color(0xFFEF4444); // red
       statusIcon = Icons.error;
-      statusText = 'Failed';
+      statusText = 'No connection';
     }
     
     return Container(
@@ -247,6 +271,40 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
     );
   }
 
+  Widget _buildServerStatusIcon({required bool hasTestedServer, required bool serverSuccessful}) {
+    IconData statusIcon;
+    Color statusColor;
+    
+    if (!hasTestedServer) {
+      statusIcon = Icons.radio_button_unchecked;
+      statusColor = const Color(0xFFEF4444); // gray
+    } else if (serverSuccessful) {
+      statusIcon = Icons.check_circle;
+      statusColor = const Color(0xFF22C55E); // green
+    } else {
+      statusIcon = Icons.error;
+      statusColor = const Color(0xFFEF4444); // red
+    }
+    
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: statusColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: statusColor.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Icon(
+        statusIcon,
+        color: statusColor,
+        size: 18,
+      ),
+    );
+  }
+
   Widget _buildServerCard({
     required String title,
     required String subtitle,
@@ -254,6 +312,8 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
     required TextEditingController portController,
     required String selectedSecurity,
     required Function(String?) onSecurityChanged,
+    required bool hasTestedServer,
+    required bool serverSuccessful,
   }) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -275,21 +335,38 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 15,
-              color: AppTheme.textSecondary,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildServerStatusIcon(
+                hasTestedServer: hasTestedServer,
+                serverSuccessful: serverSuccessful,
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           
@@ -425,11 +502,13 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Center(
-          child: Container(
-            width: 1000,
-            padding: const EdgeInsets.all(40.0),
-            child: Column(
-              children: [
+          child: SingleChildScrollView(
+            child: Container(
+              width: 1000,
+              padding: const EdgeInsets.all(40.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                 // header
                 Row(
                   children: [
@@ -489,6 +568,8 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
                         hostController: _smtpHostController,
                         portController: _smtpPortController,
                         selectedSecurity: _smtpSecurity,
+                        hasTestedServer: _hasTestedSmtp,
+                        serverSuccessful: _smtpSuccessful,
                         onSecurityChanged: (value) {
                           setState(() {
                             _smtpSecurity = value!;
@@ -504,6 +585,8 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
                         hostController: _imapHostController,
                         portController: _imapPortController,
                         selectedSecurity: _imapSecurity,
+                        hasTestedServer: _hasTestedImap,
+                        serverSuccessful: _imapSuccessful,
                         onSecurityChanged: (value) {
                           setState(() {
                             _imapSecurity = value!;
@@ -559,11 +642,13 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
                       width: 180,
                       height: 48,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _handleConfigSave,
+                        onPressed: (_isLoading || !_connectionSuccessful) ? null : _handleConfigSave,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primary,
                           foregroundColor: Colors.white,
                           elevation: 0,
+                          disabledBackgroundColor: AppTheme.border,
+                          disabledForegroundColor: AppTheme.textSecondary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -617,7 +702,8 @@ class _EmailConfigScreenState extends State<EmailConfigScreen> {
                   ),
                 
                 const SizedBox(height: 12),
-              ],
+                ],
+              ),
             ),
           ),
         ),
