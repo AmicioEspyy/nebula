@@ -37,10 +37,10 @@ class StarPainter extends CustomPainter {
     final radius = size.width * 0.4;
     final innerRadius = size.width * 0.15;
     
-    path.moveTo(centerX, centerY - radius); // Punta in alto
+    path.moveTo(centerX, centerY - radius); // top point
     
     for (int i = 0; i < 8; i++) {
-      final angle = (i * 45) * (math.pi / 180); // Converti in radianti
+      final angle = (i * 45) * (math.pi / 180); // convert to radians
       final currentRadius = i.isEven ? radius : innerRadius;
       
       final x = centerX + currentRadius * math.sin(angle);

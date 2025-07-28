@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    // Reset errori
+    // reset errors
     setState(() {
       _emailError = null;
       _passwordError = null;
@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     bool hasErrors = false;
 
-    // Validazione email
+    // email validation
     if (_emailController.text.isEmpty) {
       setState(() {
         _emailError = 'Please enter your email';
@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
       hasErrors = true;
     }
 
-    // Validazione password
+    // password validation
     if (_passwordController.text.isEmpty) {
       setState(() {
         _passwordError = 'Please enter your password';
@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (hasErrors) return;
 
-    // Usa il servizio di autenticazione
+    // auth service
     final authService = Provider.of<AuthService>(context, listen: false);
     final success = await authService.login(_emailController.text, _passwordController.text);
 
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo e titolo
+                  // logo & title
                   Container(
                     width: 56,
                     height: 56,
@@ -123,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Campo email
+                  // email field
                   Container(
                     decoration: BoxDecoration(
                       color: AppTheme.surface,
@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: AppTheme.textPrimary,
                       ),
                       decoration: const InputDecoration(
-                        hintText: 'edoardo@amicioespyy.eu',
+                        hintText: 'hi@amicioespyy.eu',
                         hintStyle: TextStyle(
                           color: AppTheme.textHint,
                           fontSize: 15,
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Campo password
+                  // password field
                   Container(
                     decoration: BoxDecoration(
                       color: AppTheme.surface,
@@ -221,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Pulsante Continue
+                  // continue button
                   Consumer<AuthService>(
                     builder: (context, authService, child) {
                       return AnimatedContainer(
@@ -293,7 +293,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   
-                  // Messaggi di errore
+                  // error messages
                   if (_emailError != null || _passwordError != null)
                     Container(
                       margin: const EdgeInsets.only(top: 16),

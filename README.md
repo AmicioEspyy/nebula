@@ -16,7 +16,7 @@ If you're crazy enough (like me) to want to work on an email client in 2025, con
 ### Guidelines
 - Follow Flutter best practices
 - Keep the UI clean and minimal
-- Write tests for new features
+- Write tests for new features (or you may not)
 - Update documentation (if any exists yet)
 
 ## License

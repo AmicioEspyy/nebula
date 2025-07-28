@@ -39,7 +39,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   void initState() {
     super.initState();
-    // Controlla lo stato di login all'avvio
+    // check login status on startup
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<AuthService>(context, listen: false).checkLoginStatus();
     });
@@ -49,12 +49,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Widget build(BuildContext context) {
     return Consumer<AuthService>(
       builder: (context, authService, child) {
-        // Mostra splash screen mentre controlla lo stato di login
+        // show splash while checking login
         if (authService.isLoading) {
           return const SplashScreen();
         }
         
-        // Naviga alla schermata appropriata basata sullo stato di login
+        // navigate based on login status
         if (authService.isLoggedIn) {
           return const HomeScreen();
         } else {

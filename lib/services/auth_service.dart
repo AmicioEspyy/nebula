@@ -9,31 +9,31 @@ class AuthService extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get userEmail => _userEmail;
 
-  // Simula il controllo dello stato di login all'avvio
+  // check login status on startup
   Future<void> checkLoginStatus() async {
     _isLoading = true;
     notifyListeners();
 
-    // Simula una verifica del token/sessione
+    // simulate token/session check
     await Future.delayed(const Duration(milliseconds: 1500));
     
-    // Per ora sempre false, in futuro controlla SharedPreferences/SecureStorage
+    // always false for now, later check
     _isLoggedIn = false;
     _isLoading = false;
     notifyListeners();
   }
 
-  // Gestisce il login
+  // handle login
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Simula una richiesta di autenticazione
+      // simulate auth request
       await Future.delayed(const Duration(seconds: 2));
 
-      // Per ora accetta qualsiasi credenziale valida
-      // In futuro qui ci sarà la logica IMAP/SMTP reale
+      // accept any valid credentials for now
+      // real IMAP/SMTP logic will go here later
       if (email.isNotEmpty && password.length >= 6) {
         _isLoggedIn = true;
         _userEmail = email;
@@ -52,7 +52,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // Gestisce il logout
+  // handle logout
   Future<void> logout() async {
     _isLoggedIn = false;
     _userEmail = null;
