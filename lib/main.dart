@@ -13,7 +13,7 @@ void main() {
   runApp(const NebulaApp());
   
   doWhenWindowReady(() {
-    const initialSize = Size(1266, 744);
+    const initialSize = Size(1266, 732);
     appWindow.minSize = const Size(1000, 600);
     appWindow.size = initialSize;
     appWindow.show();
